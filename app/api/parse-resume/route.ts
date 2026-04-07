@@ -4,8 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 import pool from '@/lib/db';
 import fs from 'fs';
 
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+
 export async function POST(req: NextRequest) {
   try {
+    const sessionAuth = await getServerSession(authOptions);
+    const userId = sessionAuth?.user ? (sessionAuth.user as any).id : null;
+
     const formData = await req.formData();
     const file = formData.get('resume') as File;
     const jobRole = formData.get('jobRole') as string;
@@ -28,11 +34,12 @@ export async function POST(req: NextRequest) {
     const sessionId = uuidv4();
     
     await pool.execute(
-      `INSERT INTO sessions (id, candidate_name, job_role, job_description, years_experience, resume_text, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
-      [sessionId, candidateName, jobRole, jobDescription, yearsExperience, resumeText]
+      `INSERT INTO sessions (id, user_id, candidate_name, job_role, job_description, years_experience, resume_text, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      [sessionId, userId, candidateName, jobRole, jobDescription, yearsExperience, resumeText]
     );
 
     fs.unlinkSync(tempPath);
+
 
     return NextResponse.json({ 
       sessionId, 

@@ -1,160 +1,130 @@
 'use client';
 
-import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import '@/styles/globals.css';
 
 export default function Home() {
   const router = useRouter();
-  const [isSettingUp, setIsSettingUp] = useState(false);
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [jobRole, setJobRole] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
-  const [yearsExperience, setYearsExperience] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resumeFile || !jobRole) return;
-
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('resume', resumeFile);
-      formData.append('jobRole', jobRole);
-      formData.append('jobDescription', jobDescription);
-      formData.append('yearsExperience', yearsExperience);
-
-      const res = await fetch('/api/parse-resume', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        alert(err.error || 'Failed to parse resume');
-        setLoading(false);
-        return;
-      }
-
-      const data = await res.json();
-      
-      if (data.sessionId) {
-        const questionsRes = await fetch('/api/generate-questions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: data.sessionId,
-            resumeText: data.resumeText,
-            jobRole,
-            yearsExperience: parseInt(yearsExperience) || 0
-          }),
-        });
-
-        if (!questionsRes.ok) {
-          const err = await questionsRes.json();
-          alert(err.error || 'Failed to generate questions');
-          setLoading(false);
-          return;
-        }
-
-        const questionsData = await questionsRes.json();
-        
-        sessionStorage.setItem('sessionId', data.sessionId);
-        sessionStorage.setItem('candidateName', data.candidateName);
-        sessionStorage.setItem('questions', JSON.stringify(questionsData.questions));
-        
-        router.push('/permissions');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+  const handleStartInterview = () => {
+    if (session) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login');
     }
-    setLoading(false);
   };
 
-  if (!isSettingUp) {
-    return (
-      <main className="container landing-container">
-        <div className="hero-section">
-          <div className="badge">✨ Next-Generation AI Mock Interviews</div>
-          <h1 className="hero-title">Acing Your Next Interview Starts Here</h1>
-          <p className="hero-subtitle">
-            Upload your resume, specify your target role, and let Sarah, our intelligent AI interviewer, simulate a realistic technical and behavioral interview for you.
-          </p>
-          <div className="hero-actions">
-            <button onClick={() => setIsSettingUp(true)} className="btn-primary hero-btn">
-              Start Interview
-            </button>
-          </div>
-        </div>
-      </main>
-    );
+  if (loading) {
+    return <div className="loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.5rem' }}>Loading Sarah AI...</div>;
   }
 
   return (
-    <main className="container">
-      <div className="hero">
-        <h1>Interview Setup</h1>
-        <p>Tell us about the role to customize your questions</p>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="form-card animate-fade-in">
-        <div className="form-group">
-          <label>Upload Resume (PDF, DOCX, TXT)</label>
-          <input
-            type="file"
-            accept=".pdf,.docx,.txt"
-            onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-            required
-            className="file-input"
-          />
+    <main className="landing-container">
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="nav-logo">Sarah AI</div>
+        <div className="nav-links">
+          {!session ? (
+            <>
+              <Link href="/login" className="btn-secondary" style={{ textDecoration: 'none' }}>Login</Link>
+              <Link href="/register" className="btn-primary" style={{ textDecoration: 'none', margin: 0 }}>Sign Up</Link>
+            </>
+          ) : (
+            <>
+               <span style={{ alignSelf: 'center', fontWeight: '500', color: '#64748b' }}>Hi, {session.user?.name}</span>
+               <Link href="/dashboard" className="btn-secondary" style={{ textDecoration: 'none' }}>Dashboard</Link>
+               <button onClick={() => signOut()} className="btn-secondary">Logout</button>
+            </>
+          )}
         </div>
-        
-        <div className="form-group">
-          <label>Job Role</label>
-          <input
-            type="text"
-            value={jobRole}
-            onChange={(e) => setJobRole(e.target.value)}
-            placeholder="e.g. Frontend Developer"
-            required
-            className="input"
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>Job Description</label>
-          <textarea
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the job description here..."
-            rows={4}
-            className="textarea"
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>Years of Experience</label>
-          <input
-            type="number"
-            value={yearsExperience}
-            onChange={(e) => setYearsExperience(e.target.value)}
-            placeholder="0"
-            min="0"
-            className="input"
-          />
-        </div>
-        
-        <div className="form-actions">
-          <button type="button" onClick={() => setIsSettingUp(false)} className="btn-secondary">
-            Back
+      </nav>
+
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="badge">✨ AI-Powered Career Growth</div>
+        <h1 className="hero-title">Master Your Interviews with Sarah</h1>
+        <p className="hero-subtitle">
+          Don't leave your dream job to chance. Sarah uses advanced Generative AI to simulate hyper-realistic interviews tailored to your resume and target role.
+        </p>
+        <div className="hero-actions" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
+          <button onClick={handleStartInterview} className="btn-primary" style={{ width: 'auto', padding: '18px 48px', fontSize: '1.2rem' }}>
+            {session ? 'Go to Dashboard' : 'Start My Free Session'}
           </button>
-          <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Processing...' : 'Continue'}
-          </button>
+          {!session && (
+            <Link href="/register" className="btn-secondary" style={{ display: 'flex', alignItems: 'center', padding: '18px 48px', fontSize: '1.2rem', textDecoration: 'none' }}>
+              Create Account
+            </Link>
+          )}
         </div>
-      </form>
+      </section>
+
+      {/* Features Section */}
+      <section className="features-section">
+        <h2 className="section-title">Why Practice with Sarah?</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">📄</div>
+            <h3>Resume-Based Questions</h3>
+            <p>Our AI analyzes your experience and skills to generate technical questions you're likely to face.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎯</div>
+            <h3>Real-time Feedback</h3>
+            <p>Get instant scoring and detailed feedback on your answers, including what you did well and what to improve.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎙️</div>
+            <h3>Voice Interaction</h3>
+            <p>Speak naturally. Sarah listens and responds with a human-like voice for a truly immersive experience.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section className="how-it-works">
+        <h2 className="section-title">Acing Your Interview is as Easy as 1-2-3</h2>
+        <div className="steps-container">
+          <div className="step-card">
+            <div className="step-number">1</div>
+            <h3>Upload & Setup</h3>
+            <p>Upload your resume and paste the job description you're targeting.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-number">2</div>
+            <h3>Mock Interview</h3>
+            <p>Interact with Sarah in a live, voice-enabled simulated interview environment.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-number">3</div>
+            <h3>Review Progress</h3>
+            <p>Analyze your scores and feedback from your dashboard to perfect your pitch.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="cta-section">
+        <h2>Ready to land that job?</h2>
+        <p style={{ fontSize: '1.2rem', marginBottom: '30px', opacity: 0.9 }}>Join thousands of candidates who improved their confidence with Sarah AI.</p>
+        <button onClick={handleStartInterview} className="btn-primary" style={{ width: 'auto', background: 'white', color: '#0f172a', padding: '18px 48px' }}>
+          Get Started Now
+        </button>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
+          © 2026 Sarah AI Mock Interview Platform. Built with Google Gemini.
+        </div>
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          <Link href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</Link>
+          <Link href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.9rem' }}>Terms of Service</Link>
+        </div>
+      </footer>
     </main>
   );
 }

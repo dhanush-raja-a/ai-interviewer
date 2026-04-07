@@ -232,7 +232,7 @@ export default function Interview() {
   const finishInterview = async (finalAnswers: Answer[]) => {
     const sessionId = sessionStorage.getItem('sessionId');
     const totalScore = finalAnswers.reduce((sum, a) => sum + a.score, 0);
-    const avgScore = (totalScore / questions.length) * 10;
+    const avgScore = totalScore / questions.length;
 
     await fetch('/api/sessions', {
       method: 'PUT',
@@ -258,78 +258,74 @@ export default function Interview() {
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <main className="container interview-container">
-      <div className="progress-bar">
+    <main className="interview-container-full">
+      <div className="progress-bar" style={{ flexShrink: 0, marginBottom: '1rem' }}>
         <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-        <span>Question {currentIndex + 1} of {questions.length}</span>
+        <span style={{ position: 'absolute', right: '10px', top: '-20px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Question {currentIndex + 1} of {questions.length}</span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-        <div className="interview-layout">
-          <div className="ai-panel">
-            <div className="ai-display" style={{ padding: '40px 0' }}>
-              <div className={`ai-avatar-3d ${isSpeaking ? 'is-speaking' : ''}`}>
-                <div className="sphere-core"></div>
-                <div className="ring ring-x"></div>
-                <div className="ring ring-y"></div>
-                <div className="ring ring-z"></div>
-                <div className="particles"></div>
-              </div>
-            </div>
-            <div className="ai-status">
-              <h3 className="ai-name">Sarah</h3>
-              <p className="ai-state">
-                {isSpeaking ? 'Speaking...' : isListening ? 'Listening your response...' : 'Processing...'}
-              </p>
+      <div className="interview-layout-compact">
+        <div className="ai-panel" style={{ height: '100%', minHeight: 0 }}>
+          <div className="ai-display" style={{ padding: '20px 0', flex: 1 }}>
+            <div className={`ai-avatar-3d ${isSpeaking ? 'is-speaking' : ''}`} style={{ width: '180px', height: '180px' }}>
+              <div className="sphere-core" style={{ width: '70px', height: '70px' }}></div>
+              <div className="ring ring-x"></div>
+              <div className="ring ring-y"></div>
+              <div className="ring ring-z"></div>
             </div>
           </div>
-
-          <div className="user-panel">
-            <div className={`video-wrapper ${isListening ? 'listening-active' : ''}`}>
-              <video ref={videoRef} autoPlay muted playsInline className="video-feed-large" />
-              {isListening && (
-                <div className="listening-overlay">
-                  <div className="audio-waves">
-                    <span></span><span></span><span></span><span></span><span></span>
-                  </div>
-                  <p>Listening to you...</p>
-                </div>
-              )}
-              <div className="user-name-tag">You (Candidate)</div>
-            </div>
+          <div className="ai-status" style={{ padding: '10px' }}>
+            <h3 className="ai-name" style={{ fontSize: '1rem' }}>Sarah</h3>
+            <p className="ai-state" style={{ fontSize: '0.8rem' }}>
+              {isSpeaking ? 'Speaking...' : isListening ? 'Listening...' : 'Processing...'}
+            </p>
           </div>
         </div>
 
-        <div className="question-display-panel" style={{ width: '100%', marginBottom: '40px' }}>
-          <div className="q-header">
-            <span className="q-label">Current Question</span>
-            <span className="q-number">#{currentIndex + 1}</span>
+        <div className="user-panel" style={{ height: '100%', minHeight: 0 }}>
+          <div className={`video-wrapper ${isListening ? 'listening-active' : ''}`} style={{ height: '100%' }}>
+            <video ref={videoRef} autoPlay muted playsInline className="video-feed-large" style={{ borderRadius: '0' }} />
+            {isListening && (
+              <div className="listening-overlay">
+                <div className="audio-waves">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+            )}
+            <div className="user-name-tag">You (Candidate)</div>
           </div>
-          <p className="q-text">{questions[currentIndex]?.question_text}</p>
-          
-          <div className="live-transcript">
-            <div className="transcript-label">Live Transcript</div>
-            <p className="transcript-text">{transcript || "Waiting for your response..."}</p>
-            {isListening && <div className="transcript-cursor"></div>}
-          </div>
+        </div>
+      </div>
 
-          <div className="interview-actions" style={{ marginTop: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button 
-              onClick={handleQuit}
-              className="btn-danger"
-              style={{ background: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '12px 24px', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}
-            >
-              Quit Interview
-            </button>
-            <button 
-              onClick={handleManualSubmit}
-              className="btn-primary"
-              style={{ width: 'auto', margin: 0 }}
-              disabled={isSpeaking || !isListening}
-            >
-              Finish Answering & Submit
-            </button>
-          </div>
+      <div className="question-display-panel question-panel-fixed">
+        <div className="q-header" style={{ marginBottom: '10px', paddingBottom: '10px' }}>
+          <span className="q-label">Current Question</span>
+          <span className="q-number">#{currentIndex + 1}</span>
+        </div>
+        <p className="q-text" style={{ fontSize: '1.2rem', marginBottom: '15px' }}>{questions[currentIndex]?.question_text}</p>
+        
+        <div className="live-transcript" style={{ marginTop: '10px', padding: '12px' }}>
+          <div className="transcript-label" style={{ fontSize: '0.7rem', marginBottom: '5px' }}>Live Transcript</div>
+          <p className="transcript-text" style={{ fontSize: '1rem' }}>{transcript || "Waiting for your response..."}</p>
+          {isListening && <div className="transcript-cursor"></div>}
+        </div>
+
+        <div className="interview-actions" style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button 
+            onClick={handleQuit}
+            className="btn-danger"
+            style={{ background: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+          >
+            Quit
+          </button>
+          <button 
+            onClick={handleManualSubmit}
+            className="btn-primary"
+            style={{ width: 'auto', margin: 0, padding: '10px 24px', fontSize: '1rem' }}
+            disabled={isSpeaking || !isListening}
+          >
+            Submit Answer
+          </button>
         </div>
       </div>
     </main>

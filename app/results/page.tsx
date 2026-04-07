@@ -36,14 +36,14 @@ export default function Results() {
     setAnswers(JSON.parse(storedAnswers));
     
     const total = JSON.parse(storedAnswers).reduce((sum: number, a: Answer) => sum + a.score, 0);
-    const avg = Math.round((total / JSON.parse(storedQuestions).length) * 10);
-    setOverallScore(avg);
+    const avg = (total / JSON.parse(storedQuestions).length);
+    setOverallScore(parseFloat(avg.toFixed(1)));
   }, [router]);
 
   const downloadReport = () => {
     let report = `AI Mock Interview Results\n`;
     report += `========================\n\n`;
-    report += `Overall Score: ${overallScore}/100\n\n`;
+    report += `Overall Score: ${overallScore}/10\n\n`;
     
     questions.forEach((q, i) => {
       const a = answers[i];
@@ -70,7 +70,7 @@ export default function Results() {
         <h1>Interview Complete!</h1>
         <div className="score-circle">
           <span className="score">{overallScore}</span>
-          <span className="label">/100</span>
+          <span className="label">/10</span>
         </div>
       </div>
 

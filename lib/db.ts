@@ -21,8 +21,19 @@ export async function initDatabase() {
     await connection.query(`USE interview_platform`);
 
     await connection.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(36) PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NULL,
         candidate_name VARCHAR(255),
         job_role VARCHAR(255),
         job_description TEXT,
@@ -30,9 +41,18 @@ export async function initDatabase() {
         resume_text TEXT,
         overall_score DECIMAL(5,2),
         status ENUM('pending','in_progress','completed') DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       )
     `);
+
+    // Ensure user_id column exists if table was created previously without it
+    const [columns] = await connection.query(`SHOW COLUMNS FROM sessions LIKE 'user_id'`);
+    if ((columns as any[]).length === 0) {
+      await connection.query(`ALTER TABLE sessions ADD COLUMN user_id VARCHAR(36) NULL AFTER id`);
+      await connection.query(`ALTER TABLE sessions ADD FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL`);
+    }
+
 
     await connection.query(`
       CREATE TABLE IF NOT EXISTS questions (
@@ -40,7 +60,7 @@ export async function initDatabase() {
         session_id VARCHAR(36),
         question_number INT,
         question_text TEXT,
-        FOREIGN KEY (session_id) REFERENCES sessions(id)
+        FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
       )
     `);
 
@@ -53,10 +73,13 @@ export async function initDatabase() {
         score DECIMAL(4,1),
         feedback TEXT,
         ideal_answer TEXT,
-        FOREIGN KEY (question_id) REFERENCES questions(id)
+        FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+        FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
       )
     `);
   } finally {
     connection.release();
   }
 }
+
+initDatabase().catch(console.error);
