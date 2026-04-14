@@ -96,4 +96,4 @@ export async function initDatabase() {
 }
 
 // Database initialized manually or via separate script
-// initDatabase().catch(console.error);
+initDatabase().catch((e) => console.log('DB Init Message (safe to ignore if already created):', e.message));
