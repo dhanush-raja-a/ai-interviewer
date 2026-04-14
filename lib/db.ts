@@ -95,4 +95,5 @@ export async function initDatabase() {
   }
 }
 
-initDatabase().catch(console.error);
+// Database initialized manually or via separate script
+// initDatabase().catch(console.error);
