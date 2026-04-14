@@ -26,6 +26,7 @@ export default function DashboardPage() {
     } else if (status === "authenticated") {
       fetchSessions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const fetchSessions = async () => {

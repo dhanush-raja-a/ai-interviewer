@@ -99,7 +99,7 @@ export default function Home() {
             </div>
             <div className="preview-content">
               <div className="wave-animation"></div>
-              <div className="preview-text">"Tell me about a time you optimized a complex React application..."</div>
+              <div className="preview-text">&quot;Tell me about a time you optimized a complex React application...&quot;</div>
             </div>
           </div>
         </div>

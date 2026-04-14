@@ -45,10 +45,12 @@ export default function Interview() {
     }
     setupCamera();
 
+    const currentVideo = videoRef.current;
+    
     // Cleanup camera when component unmounts
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      if (currentVideo && currentVideo.srcObject) {
+         const tracks = (currentVideo.srcObject as MediaStream).getTracks();
          tracks.forEach((track) => track.stop());
       }
     };
@@ -87,6 +89,7 @@ export default function Interview() {
     return () => {
       window.speechSynthesis.cancel();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, questions, finished]);
 
   const speakQuestion = (text: string) => {
@@ -327,7 +330,7 @@ export default function Interview() {
               <div style={{ flex: 1, padding: '20px', overflowY: 'auto', position: 'relative' }}>
                 {transcript ? (
                   <p style={{ fontSize: '1.1rem', color: '#e4e4e7', lineHeight: 1.6, fontStyle: 'italic' }}>
-                    "{transcript}"<span className={isListening ? 'animate-pulse' : ''} style={{ display: 'inline-block', width: '8px', height: '18px', background: isListening ? '#10b981' : 'transparent', marginLeft: '4px', verticalAlign: 'middle' }}></span>
+                    &quot;{transcript}&quot;<span className={isListening ? 'animate-pulse' : ''} style={{ display: 'inline-block', width: '8px', height: '18px', background: isListening ? '#10b981' : 'transparent', marginLeft: '4px', verticalAlign: 'middle' }}></span>
                   </p>
                 ) : (
                   <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#52525b', fontStyle: 'italic', fontSize: '0.9rem' }}>
