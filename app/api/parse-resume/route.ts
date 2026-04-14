@@ -5,7 +5,7 @@ import pool from '@/lib/db';
 import fs from 'fs';
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
