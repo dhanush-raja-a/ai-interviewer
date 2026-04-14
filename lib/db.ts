@@ -32,6 +32,17 @@ export async function initDatabase() {
       )
     `);
 
+    // Ensure users table has updated columns for OAuth
+    const [userColumns] = await connection.query(`SHOW COLUMNS FROM users`);
+    const userColNames = (userColumns as any[]).map(c => c.Field);
+    
+    if (!userColNames.includes('image')) {
+      await connection.query(`ALTER TABLE users ADD COLUMN image VARCHAR(255) AFTER name`);
+    }
+    
+    // Make password column nullable if it isn't already
+    await connection.query(`ALTER TABLE users MODIFY COLUMN password VARCHAR(255) NULL`);
+
     await connection.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         id VARCHAR(36) PRIMARY KEY,
