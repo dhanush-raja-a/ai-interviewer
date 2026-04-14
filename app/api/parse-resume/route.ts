@@ -5,11 +5,11 @@ import pool from '@/lib/db';
 import fs from 'fs';
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NEXT_AUTH_OPTIONS } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const sessionAuth = await getServerSession(authOptions);
+    const sessionAuth = await getServerSession(NEXT_AUTH_OPTIONS);
     const userId = sessionAuth?.user ? (sessionAuth.user as any).id : null;
 
     const formData = await req.formData();

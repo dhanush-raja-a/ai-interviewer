@@ -186,7 +186,7 @@ export default function DashboardPage() {
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem' }}>
               <div>
                 <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a' }}>Welcome back, {session?.user?.name}</h1>
-                <p style={{ color: '#64748b' }}>Here's what's happening with your interview progress.</p>
+                <p style={{ color: '#64748b' }}>Here&apos;s what&apos;s happening with your interview progress.</p>
               </div>
               <button onClick={() => setIsSettingUp(true)} className="btn-primary" style={{ width: 'auto', padding: '12px 24px', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)' }}>
                 + Start New Interview

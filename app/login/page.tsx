@@ -79,7 +79,7 @@ export default function LoginPage() {
           Continue with Google
         </button>
         <p style={{ textAlign: 'center', marginTop: '1rem', color: '#666' }}>
-          Don't have an account? <Link href="/register" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Sign up</Link>
+          Don&apos;t have an account? <Link href="/register" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Sign up</Link>
         </p>
       </div>
     </main>

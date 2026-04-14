@@ -64,7 +64,7 @@ export default function Permissions() {
     <main className="container permissions-container">
       <div className="hero permissions-hero">
         <h1>Device Setup</h1>
-        <p>Let's make sure everything is working before we start.</p>
+        <p>Let&apos;s make sure everything is working before we start.</p>
       </div>
       
       <div className="permissions-split">

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NEXT_AUTH_OPTIONS } from "@/lib/auth";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(NEXT_AUTH_OPTIONS);
 
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

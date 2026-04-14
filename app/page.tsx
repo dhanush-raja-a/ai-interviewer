@@ -48,7 +48,7 @@ export default function Home() {
         <div className="badge">✨ AI-Powered Career Growth</div>
         <h1 className="hero-title">Master Your Interviews with Sarah</h1>
         <p className="hero-subtitle">
-          Don't leave your dream job to chance. Sarah uses advanced Generative AI to simulate hyper-realistic interviews tailored to your resume and target role.
+          Don&apos;t leave your dream job to chance. Sarah uses advanced Generative AI to simulate hyper-realistic interviews tailored to your resume and target role.
         </p>
         <div className="hero-actions" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
           <button onClick={handleStartInterview} className="btn-primary" style={{ width: 'auto', padding: '18px 48px', fontSize: '1.2rem' }}>
@@ -69,7 +69,7 @@ export default function Home() {
           <div className="feature-card">
             <div className="feature-icon">📄</div>
             <h3>Resume-Based Questions</h3>
-            <p>Our AI analyzes your experience and skills to generate technical questions you're likely to face.</p>
+            <p>Our AI analyzes your experience and skills to generate technical questions you&apos;re likely to face.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">🎯</div>
@@ -91,7 +91,7 @@ export default function Home() {
           <div className="step-card">
             <div className="step-number">1</div>
             <h3>Upload & Setup</h3>
-            <p>Upload your resume and paste the job description you're targeting.</p>
+            <p>Upload your resume and paste the job description you&apos;re targeting.</p>
           </div>
           <div className="step-card">
             <div className="step-number">2</div>

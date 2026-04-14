@@ -6,7 +6,7 @@ import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import { v4 as uuidv4 } from 'uuid';
 
-export const authOptions: NextAuthOptions = {
+export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
