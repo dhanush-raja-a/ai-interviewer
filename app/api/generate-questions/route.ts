@@ -5,13 +5,13 @@ import pool from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
-    const { sessionId, resumeText, jobRole, yearsExperience } = await req.json();
+    const { sessionId, resumeText, jobRole, yearsExperience, jobDescription } = await req.json();
 
     if (!sessionId || !resumeText || !jobRole) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const questions = await generateQuestions(resumeText, jobRole, yearsExperience || 0);
+    const questions = await generateQuestions(resumeText, jobRole, yearsExperience || 0, jobDescription || '');
 
     const questionObjects = [];
     for (let i = 0; i < questions.length; i++) {
