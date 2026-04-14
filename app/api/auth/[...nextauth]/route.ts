@@ -1,11 +1,17 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
+import { v4 as uuidv4 } from 'uuid';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -47,9 +53,34 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "supersecretkey9999",
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        if (!user.email) return false;
+        const [existingUsers] = await pool.execute<RowDataPacket[]>(
+          "SELECT * FROM users WHERE email = ?",
+          [user.email]
+        );
+
+        if (existingUsers.length === 0) {
+          const id = uuidv4();
+          await pool.execute(
+            "INSERT INTO users (id, email, name, image) VALUES (?, ?, ?, ?)",
+            [id, user.email || "", user.name || "", user.image || null]
+          );
+          (user as any).id = id;
+        } else {
+          await pool.execute(
+            "UPDATE users SET name = ?, image = ? WHERE email = ?",
+            [user.name || "", user.image || null, user.email || ""]
+          );
+          (user as any).id = existingUsers[0].id;
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id;
+        token.id = (user as any).id;
       }
       return token;
     },

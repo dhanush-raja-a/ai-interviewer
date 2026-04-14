@@ -1,13 +1,17 @@
 import mysql from 'mysql2/promise';
 
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'interview_platform',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'root',
+  database: process.env.DB_NAME || 'interview_platform',
+  port: parseInt(process.env.DB_PORT || '3306'),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  ssl: process.env.DB_SSL === 'true' ? {
+    rejectUnauthorized: false
+  } : undefined
 });
 
 export default pool;
@@ -15,17 +19,15 @@ export default pool;
 export async function initDatabase() {
   const connection = await pool.getConnection();
   try {
-    await connection.query(`
-      CREATE DATABASE IF NOT EXISTS interview_platform
-    `);
-    await connection.query(`USE interview_platform`);
+    // Tables will be created in the database specified in the connection pool (DB_NAME)
 
     await connection.query(`
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(36) PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NULL,
         name VARCHAR(255),
+        image VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
