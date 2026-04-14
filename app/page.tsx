@@ -4,11 +4,21 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import '@/styles/globals.css';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const loading = status === "loading";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleStartInterview = () => {
     if (session) {
@@ -19,110 +29,131 @@ export default function Home() {
   };
 
   if (loading) {
-    return <div className="loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.5rem' }}>Loading Sarah AI...</div>;
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-black">
+        <div className="loader-ring"></div>
+      </div>
+    );
   }
 
   return (
-    <main className="landing-container">
+    <main className="landing-premium">
+      <div className="ambient-glow top-glow"></div>
+      <div className="ambient-glow bottom-glow"></div>
+      
+      {/* Dynamic Grid Background */}
+      <div className="grid-bg"></div>
+
       {/* Navbar */}
-      <nav className="navbar">
-        <div className="nav-logo">Sarah AI</div>
-        <div className="nav-links">
+      <nav className={`navbar-premium ${scrolled ? 'scrolled' : ''}`}>
+        <div className="nav-logo-premium">
+          <div className="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="m12 12 9.9 4.9"/></svg>
+          </div>
+          <span>Sarah AI</span>
+        </div>
+        <div className="nav-links-premium">
           {!session ? (
             <>
-              <Link href="/login" className="btn-secondary" style={{ textDecoration: 'none' }}>Login</Link>
-              <Link href="/register" className="btn-primary" style={{ textDecoration: 'none', margin: 0 }}>Sign Up</Link>
+              <Link href="/login" className="nav-link-subtle">Log In</Link>
+              <Link href="/register" className="btn-glow">Get Started</Link>
             </>
           ) : (
             <>
-               <span style={{ alignSelf: 'center', fontWeight: '500', color: '#64748b' }}>Hi, {session.user?.name}</span>
-               <Link href="/dashboard" className="btn-secondary" style={{ textDecoration: 'none' }}>Dashboard</Link>
-               <button onClick={() => signOut()} className="btn-secondary">Logout</button>
+               <Link href="/dashboard" className="nav-link-subtle">Dashboard</Link>
+               <button onClick={() => signOut()} className="nav-link-subtle">Sign Out</button>
+               <div className="avatar-mini">{session.user?.name?.charAt(0) || 'U'}</div>
             </>
           )}
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="badge">✨ AI-Powered Career Growth</div>
-        <h1 className="hero-title">Master Your Interviews with Sarah</h1>
-        <p className="hero-subtitle">
-          Don&apos;t leave your dream job to chance. Sarah uses advanced Generative AI to simulate hyper-realistic interviews tailored to your resume and target role.
+      <section className="hero-premium">
+        <div className="badge-premium">
+          <span className="badge-dot"></span>
+          Revolutionizing Interview Prep
+        </div>
+        <h1 className="hero-title-premium">
+          Master Your Interviews <br />
+          <span className="text-gradient">With Artificial Intelligence.</span>
+        </h1>
+        <p className="hero-subtitle-premium">
+          Stop leaving opportunities to chance. Sarah simulates hyper-realistic, 
+          tailored interviews based on your specific resume and target role.
         </p>
-        <div className="hero-actions" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
-          <button onClick={handleStartInterview} className="btn-primary" style={{ width: 'auto', padding: '18px 48px', fontSize: '1.2rem' }}>
-            {session ? 'Go to Dashboard' : 'Start My Free Session'}
+        <div className="hero-actions-premium">
+          <button onClick={handleStartInterview} className="btn-glow large">
+            <span className="btn-text">{session ? 'Enter Dashboard' : 'Start Free Session'}</span>
+            <svg className="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
-          {!session && (
-            <Link href="/register" className="btn-secondary" style={{ display: 'flex', alignItems: 'center', padding: '18px 48px', fontSize: '1.2rem', textDecoration: 'none' }}>
-              Create Account
-            </Link>
-          )}
+        </div>
+        
+        {/* Abstract App Preview */}
+        <div className="hero-preview-wrapper">
+          <div className="hero-preview">
+            <div className="browser-header">
+              <span className="dot close"></span>
+              <span className="dot min"></span>
+              <span className="dot max"></span>
+            </div>
+            <div className="preview-content">
+              <div className="wave-animation"></div>
+              <div className="preview-text">"Tell me about a time you optimized a complex React application..."</div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="features-section">
-        <h2 className="section-title">Why Practice with Sarah?</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">📄</div>
-            <h3>Resume-Based Questions</h3>
-            <p>Our AI analyzes your experience and skills to generate technical questions you&apos;re likely to face.</p>
+      <section className="features-premium">
+        <div className="section-header">
+          <h2>Engineered for Excellence</h2>
+          <p>Everything you need to land your dream offer</p>
+        </div>
+        
+        <div className="bento-grid">
+          <div className="bento-card col-span-2">
+            <div className="bento-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <h3>Context-Aware Questions</h3>
+            <p>Advanced natural language processing immediately analyzes your resume and generates highly technical, targeted questions identical to what top tech companies ask.</p>
           </div>
-          <div className="feature-card">
-            <div className="feature-icon">🎯</div>
-            <h3>Real-time Feedback</h3>
-            <p>Get instant scoring and detailed feedback on your answers, including what you did well and what to improve.</p>
+          <div className="bento-card bg-gradient">
+            <div className="bento-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </div>
+            <h3>Real-Time Analytics</h3>
+            <p>Immediate actionable feedback on delivery, technical accuracy, and structure.</p>
           </div>
-          <div className="feature-card">
-            <div className="feature-icon">🎙️</div>
-            <h3>Voice Interaction</h3>
-            <p>Speak naturally. Sarah listens and responds with a human-like voice for a truly immersive experience.</p>
+          <div className="bento-card">
+            <div className="bento-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            </div>
+            <h3>Voice Native</h3>
+            <p>Speak naturally with sub-500ms latency voice interaction.</p>
           </div>
         </div>
-      </section>
-
-      {/* How it Works */}
-      <section className="how-it-works">
-        <h2 className="section-title">Acing Your Interview is as Easy as 1-2-3</h2>
-        <div className="steps-container">
-          <div className="step-card">
-            <div className="step-number">1</div>
-            <h3>Upload & Setup</h3>
-            <p>Upload your resume and paste the job description you&apos;re targeting.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-number">2</div>
-            <h3>Mock Interview</h3>
-            <p>Interact with Sarah in a live, voice-enabled simulated interview environment.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-number">3</div>
-            <h3>Review Progress</h3>
-            <p>Analyze your scores and feedback from your dashboard to perfect your pitch.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta-section">
-        <h2>Ready to land that job?</h2>
-        <p style={{ fontSize: '1.2rem', marginBottom: '30px', opacity: 0.9 }}>Join thousands of candidates who improved their confidence with Sarah AI.</p>
-        <button onClick={handleStartInterview} className="btn-primary" style={{ width: 'auto', background: 'white', color: '#0f172a', padding: '18px 48px' }}>
-          Get Started Now
-        </button>
       </section>
 
       {/* Footer */}
-      <footer className="footer">
-        <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-          © 2026 Sarah AI Mock Interview Platform. Built with Google Gemini.
+      <footer className="footer-premium">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <div className="logo-icon-small">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="m12 12 9.9 4.9"/></svg>
+            </div>
+            Sarah AI
+          </div>
+          <div className="footer-links">
+            <Link href="#">Privacy Policy</Link>
+            <Link href="#">Terms of Service</Link>
+            <Link href="#">Contact</Link>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '2rem' }}>
-          <Link href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</Link>
-          <Link href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.9rem' }}>Terms of Service</Link>
+        <div className="footer-bottom">
+          <p>© 2026 Sarah AI. Architected for peak performance.</p>
         </div>
       </footer>
     </main>
